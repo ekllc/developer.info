@@ -3,20 +3,21 @@
 DATE=`date +%Y-%m-%d`
 DATE_TIME=`date '+%Y-%m-%d %H:%M:%S'`
 
-# Contanier details at https://hub.docker.com/_/couchdb
+# Contanier details at https://hub.docker.com/_/mongo
 
-export containerName=couchdb
+export containerName=mongo
 export hostAddress=127.0.0.1
-export hostPort=5984
-export WEB_ADDR="http://${hostAddress}:${hostPort}/_utils/"
+export hostPort=27017
+export WEB_ADDR="http://${hostAddress}:${hostPort}"
 
 echo "\n -------- Downloading container: ${containerName} -------- \n "  
 docker pull ${containerName}:latest &
 
 
 sleep 15
-echo "\n -------- Starting container: ${containerName}  -------- \n"
-docker container run -d -p 5984:5984  -v ~/TOOLS/couchdb/couchdb_data:/opt/couchdb/data ${containerName}:latest
+printf "\n -------- Starting container: ${containerName}  -------- \n"
+docker run -p ${hostPort}:${hostPort} -d --name mongodb -e MONGO_INITDB_ROOT_USERNAME=mongoadmin -e MONGO_INITDB_ROOT_PASSWORD=secret -v ~/TOOLS/mongodb/mongo_data:/data/db ${containerName} &
+
 sleep 15
 
 echo '\n\n -------- Container information -------- \n'
@@ -34,6 +35,6 @@ printf "\n\n"
 sleep 2
 docker logs -f $containerId &
 
-sleep 5
+sleep 15
 open -a 'Google Chrome' $WEB_ADDR
 exit 0
